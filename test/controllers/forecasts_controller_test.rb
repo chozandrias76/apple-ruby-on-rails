@@ -5,7 +5,7 @@ class ForecastsControllerTest < ActionDispatch::IntegrationTest
     @forecast_id = rand(100).floor
   end
 
-  test "should show forecast" do
+  test "should search forecast" do
     get forecasts_search_url(@forecast_id), as: :json
     assert_response :success
   end
