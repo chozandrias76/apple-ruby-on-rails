@@ -13,8 +13,9 @@ It focuses on backend functionality, prioritizing the retrieval and caching of w
 Instructions on how to install any dependencies for running the project.
 
 ```bash
+sudo apt-get install redis-server
 bundle
-rails s -p 5000
+weather/bin/rails s
 ```
 ## Usage
 
