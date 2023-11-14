@@ -1,15 +1,15 @@
 class ForecastsController < ApplicationController
-  before_action :set_forecast, only: %i[ show ]
+  before_action :search_forecast, only: %i[ search ]
 
-  # GET /forecasts/1
-  # GET /forecasts/1.json
-  def show
+  # GET /forecasts/search
+  # GET /forecasts/search.json
+  def search
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_forecast
-      @forecast =  OpenStruct.new() 
+    def search_forecast
+      @forecast = OpenStruct.new() 
     end
 
     # Only allow a list of trusted parameters through.

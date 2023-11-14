@@ -19,7 +19,8 @@ bundle
 ```
 ## Usage
 
-```ruby
+```bash
+curl -X GET -H 'Content-Type: application/json' localhost:3000/forecasts/search?address=123+Fake+St+Seattle+Washington
 ```
 ## Testing
 

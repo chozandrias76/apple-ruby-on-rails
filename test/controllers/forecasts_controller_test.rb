@@ -6,7 +6,7 @@ class ForecastsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should show forecast" do
-    get forecast_url(@forecast_id), as: :json
+    get forecasts_search_url(@forecast_id), as: :json
     assert_response :success
   end
 end
