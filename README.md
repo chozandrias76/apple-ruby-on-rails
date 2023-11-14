@@ -15,7 +15,7 @@ Instructions on how to install any dependencies for running the project.
 ```bash
 sudo apt-get install redis-server
 bundle
-weather/bin/rails s
+./bin/rails s
 ```
 ## Usage
 
@@ -25,3 +25,8 @@ weather/bin/rails s
 
 ```bash
 ```
+
+## References
+
+* https://geocode.maps.co/
+* https://www.weather.gov/documentation/services-web-api#/
