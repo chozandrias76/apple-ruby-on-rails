@@ -50,7 +50,7 @@ class AddressSearch
       Rails.logger.debug "#{self.class.name}: Response contained an empty body"
       return []
     end
-    [processed_response["lat"], processed_response["lon"]]
+    [processed_response["lat"], processed_response["lon"], zip_code]
   end
 
   def cache_key
