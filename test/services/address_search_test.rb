@@ -4,7 +4,7 @@ require 'minitest/spec'
 
 describe AddressSearch do
   before(:each) do
-    @zip_code = 98115
+    @zip_code = "98115"
     @address = "123 Fake St. Seattle, WA, #{@zip_code}, US"
     @address_search = AddressSearch.new(@address)
     @expected_request_url = /https:\/\/geocode.maps.co\/search\?q.*/
@@ -22,12 +22,12 @@ describe AddressSearch do
       when the external request returns a successful status code" do
     stub_request(:get, @expected_request_url).to_return(status: 200, body: "[{\"lat\": \"123.45\", \"lon\": \"-678.91\"}]", headers: {})
 
-    assert_equal ["123.45", "-678.91"], @address_search.perform
+    assert_equal ["123.45", "-678.91", @zip_code], @address_search.perform
   end
 
   it "it should respond to .perform with a cached tuple \
       when the cache matches a zip-code" do
-      cached_data = [1,2]
+      cached_data = [1,2, @zip_code]
       $redis.set("address_search:#{@zip_code}", cached_data)
 
       assert_equal cached_data, @address_search.perform

@@ -10,7 +10,7 @@ class ForecastsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def search_forecast
       latitude, longitude, zip_code = AddressSearch.new(forecast_params[:address]).perform
-      @forecast = OpenStruct.new(latitude: latitude, longitude: longitude) 
+      @forecast = ForecastSearch.new(latitude: latitude, longitude: longitude, zip_code: zip_code).perform
     end
 
     # Only allow a list of trusted parameters through.
