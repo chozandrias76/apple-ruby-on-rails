@@ -26,7 +26,7 @@ class ForecastSearch
   # should match the current hour
   # @return [Forecast] A new or cached forecast with up-to-date data
   def perform
-    return cached_result if cached_result
+    return @forecast if cached_result
 
     response = point_weather
     unless response.is_a?(Net::HTTPSuccess)
@@ -60,10 +60,9 @@ class ForecastSearch
   end
 
   def cached_result
-    if Weather.redis.get(@cache_key)
-      Rails.logger.debug "#{self.class.name}: Providing cached result"
-      Forecast.new(JSON.parse(Weather.redis.get(@cache_key)))
-    end
+    return unless Weather.redis.get(@cache_key)
+
+    @forecast = Forecast.new(JSON.parse(Weather.redis.get(@cache_key)))
   end
 
   def forecast_hourly_request(response_body)

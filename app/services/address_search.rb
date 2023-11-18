@@ -19,27 +19,42 @@ class AddressSearch
   # @return [[String, String]] Float-like string representations of
   # the address' latitude and longitude
   def perform
-    cached_result = Weather.redis.get(cache_key)
-    if cached_result
-      Rails.logger.debug "#{self.class.name}: Providing cached result"
-      return JSON.parse(cached_result)
-    end
+    return cached_result if cached_result
 
-    response = make_api_call
+    response = fetch_latitude_longitude
     unless response.is_a?(Net::HTTPSuccess)
-      Rails.logger.debug "#{self.class.name}: Response did not return a successful status code"
+      log_unsuccessful_response
       return []
     end
 
-    complete_response = processed_response(response)
+    latitude_and_longitude = latitude_longitude_and_update_cache(response)
 
-    Weather.redis.set(cache_key, complete_response.to_json, ex: 1800)
-
-    Rails.logger.info "#{self.class.name}: Providing a newly cached latitude and longitude"
-    complete_response
+    log_successful_response
+    latitude_and_longitude
   end
 
   private
+
+  def latitude_longitude_and_update_cache(response)
+    latitude_and_longitude = processed_response(response)
+
+    Weather.redis.set(cache_key, latitude_and_longitude.to_json, ex: Constants::DEFAULT_CACHE_DURATION_SECONDS)
+    latitude_and_longitude
+  end
+
+  def log_successful_response
+    Rails.logger.info "#{self.class.name}: Providing a newly cached latitude and longitude"
+  end
+
+  def log_unsuccessful_response
+    Rails.logger.debug "#{self.class.name}: Response did not return a successful status code"
+  end
+
+  def cached_result
+    return unless Weather.redis.get(cache_key)
+
+    JSON.parse(Weather.redis.get(cache_key))
+  end
 
   def processed_response(response)
     processed_response = JSON.parse(response.body)[0]
@@ -64,7 +79,7 @@ class AddressSearch
     (match || [])[0]
   end
 
-  def make_api_call
+  def fetch_latitude_longitude
     uri = URI.parse(EXTERNAL_URI)
     uri.query = URI.encode_www_form(q: @address)
     Net::HTTP.get_response(uri)
