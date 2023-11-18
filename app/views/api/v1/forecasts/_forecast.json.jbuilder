@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 json.data do
   json.type 'forecast'
   json.id forecast.zip_code
@@ -5,6 +7,6 @@ json.data do
     json.current_temperature forecast.current_temperature
   end
   json.links do
-    json.self forecasts_search_url(zip_code: forecast.zip_code, format: :json)
+    json.self api_v1_forecasts_search_url(zip_code: forecast.zip_code, format: :json)
   end
 end

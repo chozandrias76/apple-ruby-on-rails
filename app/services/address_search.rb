@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require 'net/http'
 require 'uri'
 require 'json'
 
 # Provides data from geocode.maps.co
 class AddressSearch
-  EXTERNAL_URI = "https://geocode.maps.co/search".freeze
-  ZIP_MATCH = /(?<!^)\b\d{5}(-\d{4})?\b/.freeze
+  EXTERNAL_URI = 'https://geocode.maps.co/search'
+  ZIP_MATCH = /(?<!^)\b\d{5}(-\d{4})?\b/
 
   # @param address [String] an unencoded string of the full address
   def initialize(address)
@@ -20,9 +22,9 @@ class AddressSearch
     cached_result = $redis.get(cache_key)
     if cached_result
       Rails.logger.debug "#{self.class.name}: Providing cached result"
-      return JSON.parse(cached_result) 
+      return JSON.parse(cached_result)
     end
-  
+
     response = make_api_call
     unless response.is_a?(Net::HTTPSuccess)
       Rails.logger.debug "#{self.class.name}: Response did not return a successful status code"
@@ -32,7 +34,7 @@ class AddressSearch
     complete_response = processed_response(response)
 
     $redis.set(cache_key, complete_response.to_json, ex: 1800)
-    
+
     Rails.logger.info "#{self.class.name}: Providing a newly cached latitude and longitude"
     complete_response
   end
@@ -50,12 +52,11 @@ class AddressSearch
       Rails.logger.debug "#{self.class.name}: Response contained an empty body"
       return []
     end
-    [processed_response["lat"], processed_response["lon"], zip_code]
+    [processed_response['lat'], processed_response['lon'], zip_code]
   end
 
   def cache_key
-    key = "#{self.class.name.underscore}:#{zip_code}"
-    return key
+    "#{self.class.name.underscore}:#{zip_code}"
   end
 
   def zip_code
