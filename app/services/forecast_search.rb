@@ -32,16 +32,16 @@ class ForecastSearch
       return Forecast.new(JSON.parse(cached_result))
     end
 
-    response = fetch_point_weather
+    response = point_weather
     unless response.is_a?(Net::HTTPSuccess)
 
       Rails.logger.debug "#{self.class.name}: Response did not return a successful status code"
       return @forecast
     end
 
-    initial_response = get_forecast_hourly_request(response.body)
+    initial_response = forecast_hourly_request(response.body)
     complete_response = fetch_hourly_forecast(initial_response)
-    set_forecast_current_temperature(complete_response.body)
+    forecast_current_temperature = complete_response.body
 
     $redis.set(@cache_key, @forecast.to_json, ex: Constants::DEFAULT_CACHE_DURATION_SECONDS)
 
@@ -51,17 +51,17 @@ class ForecastSearch
 
   private
 
-  def get_forecast_hourly_request(response_body)
+  def forecast_hourly_request(response_body)
     JSON.parse(response_body)['properties']['forecastHourly']
   end
 
-  def fetch_point_weather
+  def point_weather
     Net::HTTP.get_response(
       URI.parse(@initial_request_uri)
     )
   end
 
-  def set_forecast_current_temperature(response_body)
+  def forecast_current_temperature=(response_body)
     @forecast.current_temperature =
       JSON.parse(response_body)['properties']['periods'].first['temperature']
   end
