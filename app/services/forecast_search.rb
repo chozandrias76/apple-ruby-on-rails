@@ -18,38 +18,53 @@ class ForecastSearch
     @initial_request_uri = "#{INITIAL_EXTERNAL_URI}#{@latitude},#{@longitude}"
   end
 
-  # Fetches cross origin and provides the temperature in F
+  # Fetches cross origin and provides a Forecast
   # for a given location at the current time
   # @note the provider gives a forecastHourly link, which is the second
   # request target URI
   # @note the provider yields an array of hourly forecast periods, of which, the first
   # should match the current hour
-  # @return [Integer] The value of temperature in F
+  # @return [Forecast] A new or cached forecast with up-to-date data
   def perform
-    cached_result = Weather.redis.get(@cache_key)
-    if cached_result
-      Rails.logger.debug "#{self.class.name}: Providing cached result"
-      return Forecast.new(JSON.parse(cached_result))
-    end
+    return cached_result if cached_result
 
     response = point_weather
     unless response.is_a?(Net::HTTPSuccess)
 
-      Rails.logger.debug "#{self.class.name}: Response did not return a successful status code"
+      log_unsuccessful_response
       return @forecast
     end
 
+    update_forecast_and_cache(response)
+
+    log_successful_response
+    @forecast
+  end
+
+  private
+
+  def update_forecast_and_cache(response)
     forecast_hourly_request = forecast_hourly_request(response.body)
     complete_response = fetch_hourly_forecast(forecast_hourly_request)
     update_forecast_current_temperature(complete_response.body)
 
     Weather.redis.set(@cache_key, @forecast.to_json, ex: Constants::DEFAULT_CACHE_DURATION_SECONDS)
-
-    Rails.logger.info "#{self.class.name}: Providing a newly cached forecast"
-    @forecast
   end
 
-  private
+  def log_successful_response
+    Rails.logger.info "#{self.class.name}: Providing a newly cached forecast"
+  end
+
+  def log_unsuccessful_response
+    Rails.logger.debug "#{self.class.name}: Response did not return a successful status code"
+  end
+
+  def cached_result
+    if Weather.redis.get(@cache_key)
+      Rails.logger.debug "#{self.class.name}: Providing cached result"
+      Forecast.new(JSON.parse(Weather.redis.get(@cache_key)))
+    end
+  end
 
   def forecast_hourly_request(response_body)
     JSON.parse(response_body)['properties']['forecastHourly']
