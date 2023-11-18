@@ -1,7 +1,10 @@
-ENV["RAILS_ENV"] ||= "test"
-require_relative "../config/environment"
-require "rails/test_help"
+# frozen_string_literal: true
+
+ENV['RAILS_ENV'] ||= 'test'
+require_relative '../config/environment'
+require 'rails/test_help'
 require 'webmock/minitest'
+require 'minitest/autorun'
 require 'mock_redis'
 
 # Configure WebMock
@@ -12,7 +15,7 @@ module ActiveSupport
     # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
 
-      # Replace Redis with MockRedis in tests
+    # Replace Redis with MockRedis in tests
     def setup
       $redis = MockRedis.new
     end
