@@ -13,7 +13,7 @@ class ForecastSearch
   def initialize(latitude:, longitude:, zip_code:)
     @latitude = format('%<num>0.4f', num: latitude)
     @longitude = format('%<num>0.4f', num: longitude)
-    @forecast = Forecast.new({ 'zip_code' => zip_code })
+    @forecast = Forecast.new(zip_code:)
     @cache_key = "#{self.class.name.underscore}:#{zip_code}"
     @initial_request_uri = "#{INITIAL_EXTERNAL_URI}#{@latitude},#{@longitude}"
   end
@@ -46,7 +46,8 @@ class ForecastSearch
   def update_forecast_and_cache(response)
     forecast_hourly_request = forecast_hourly_request(response.body)
     complete_response = fetch_hourly_forecast(forecast_hourly_request)
-    update_forecast_current_temperature(complete_response.body)
+    @forecast.current_temperature =
+      JSON.parse(complete_response.body)['properties']['periods'].first['temperature']
 
     Weather.redis.set(@cache_key, @forecast.to_json, ex: Constants::DEFAULT_CACHE_DURATION_SECONDS)
   end
@@ -62,7 +63,7 @@ class ForecastSearch
   def cached_result
     return unless Weather.redis.get(@cache_key)
 
-    @forecast = Forecast.new(JSON.parse(Weather.redis.get(@cache_key)))
+    @forecast = Forecast.new(**JSON.parse(Weather.redis.get(@cache_key)).symbolize_keys)
   end
 
   def forecast_hourly_request(response_body)
@@ -73,11 +74,6 @@ class ForecastSearch
     Net::HTTP.get_response(
       URI.parse(@initial_request_uri)
     )
-  end
-
-  def update_forecast_current_temperature(response_body)
-    @forecast.current_temperature =
-      JSON.parse(response_body)['properties']['periods'].first['temperature']
   end
 
   # @param forecast_hourly_request [String] example:
