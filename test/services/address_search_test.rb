@@ -1,9 +1,8 @@
 # frozen_string_literal: true
-
 require 'test_helper'
 require 'minitest/spec'
 
-describe AddressSearch do
+describe AddressSearch do # rubocop:disable Metrics/BlockLength
   before(:each) do
     @zip_code = '98115'
     @address = "123 Fake St. Seattle, WA, #{@zip_code}, US"
@@ -12,7 +11,7 @@ describe AddressSearch do
   end
 
   after(:each) do
-    $redis.flushdb
+    Weather.redis.flushdb
   end
 
   it 'it should be a class with the expected name' do
@@ -30,7 +29,7 @@ describe AddressSearch do
   it "it should respond to .perform with a cached tuple \
       when the cache matches a zip-code" do
     cached_data = [1, 2, @zip_code]
-    $redis.set("address_search:#{@zip_code}", cached_data)
+    Weather.redis.set("address_search:#{@zip_code}", cached_data)
 
     assert_equal cached_data, @address_search.perform
   end

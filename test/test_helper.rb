@@ -15,9 +15,5 @@ module ActiveSupport
     # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
 
-    # Replace Redis with MockRedis in tests
-    def setup
-      $redis = MockRedis.new
-    end
   end
 end

@@ -19,7 +19,7 @@ class AddressSearch
   # @return [[String, String]] Float-like string representations of
   # the address' latitude and longitude
   def perform
-    cached_result = $redis.get(cache_key)
+    cached_result = Weather.redis.get(cache_key)
     if cached_result
       Rails.logger.debug "#{self.class.name}: Providing cached result"
       return JSON.parse(cached_result)
@@ -33,7 +33,7 @@ class AddressSearch
 
     complete_response = processed_response(response)
 
-    $redis.set(cache_key, complete_response.to_json, ex: 1800)
+    Weather.redis.set(cache_key, complete_response.to_json, ex: 1800)
 
     Rails.logger.info "#{self.class.name}: Providing a newly cached latitude and longitude"
     complete_response

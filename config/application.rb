@@ -21,6 +21,15 @@ require 'rails/test_unit/railtie'
 Bundler.require(*Rails.groups)
 
 module Weather
+  def self.redis
+    @redis ||=
+      if Rails.env.test?
+        MockRedis.new
+      else
+        Redis.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/1')
+      end
+  end
+
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.1

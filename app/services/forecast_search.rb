@@ -26,7 +26,7 @@ class ForecastSearch
   # should match the current hour
   # @return [Integer] The value of temperature in F
   def perform
-    cached_result = $redis.get(@cache_key)
+    cached_result = Weather.redis.get(@cache_key)
     if cached_result
       Rails.logger.debug "#{self.class.name}: Providing cached result"
       return Forecast.new(JSON.parse(cached_result))
@@ -39,13 +39,13 @@ class ForecastSearch
       return @forecast
     end
 
-    initial_response = forecast_hourly_request(response.body)
-    complete_response = fetch_hourly_forecast(initial_response)
-    forecast_current_temperature = complete_response.body
+    forecast_hourly_request = forecast_hourly_request(response.body)
+    complete_response = fetch_hourly_forecast(forecast_hourly_request)
+    update_forecast_current_temperature(complete_response.body)
 
-    $redis.set(@cache_key, @forecast.to_json, ex: Constants::DEFAULT_CACHE_DURATION_SECONDS)
+    Weather.redis.set(@cache_key, @forecast.to_json, ex: Constants::DEFAULT_CACHE_DURATION_SECONDS)
 
-    Rails.logger.info "#{self.class.name}: Providing a newly cached latitude and longitude"
+    Rails.logger.info "#{self.class.name}: Providing a newly cached forecast"
     @forecast
   end
 
@@ -61,7 +61,7 @@ class ForecastSearch
     )
   end
 
-  def forecast_current_temperature=(response_body)
+  def update_forecast_current_temperature(response_body)
     @forecast.current_temperature =
       JSON.parse(response_body)['properties']['periods'].first['temperature']
   end
