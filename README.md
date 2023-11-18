@@ -24,7 +24,7 @@ bundle
 ## Usage
 
 ```bash
-curl -X GET -H 'Content-Type: application/json' localhost:3000/forecasts/search?address=123+Fake+St+Seattle+Washington
+curl -X GET -H 'Content-Type: application/json' localhost:3000/forecasts/search?forecast[address]=123+Fake+St+Seattle+Washington+98115
 ```
 
 ### Output
