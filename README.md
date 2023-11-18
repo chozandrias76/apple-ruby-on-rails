@@ -22,12 +22,18 @@ bundle
 ```bash
 curl -X GET -H 'Content-Type: application/json' localhost:3000/forecasts/search?address=123+Fake+St+Seattle+Washington
 ```
+
+### Output
+```json
+{"data":{"type":"forecast","id":"98115","attributes":{"current_temperature":52},"links":{"self":"http://localhost:3000/api/v1/forecasts/search.json?zip_code=98115"}}}
+```
 ## Testing
 
 ```bash
+./bin/rails test
 ```
 
 ## References
 
 * https://geocode.maps.co/
-* https://www.weather.gov/documentation/services-web-api#/
+* https://www.weather.gov/documentation/services-web-api/
