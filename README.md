@@ -15,7 +15,11 @@ Instructions on how to install any dependencies for running the project.
 ```bash
 sudo apt-get install redis-server
 bundle
-./bin/rails s
+```
+
+## Setup
+```bash
+.bin/rails s
 ```
 ## Usage
 
