@@ -11,9 +11,10 @@ require 'json'
 # two requests per second.
 #
 # @example
-#   search = AddressSearch.new(address: "1600 Amphitheatre Parkway, Mountain View, CA")
+#   search = AddressSearch.new(address: "1600 Amphitheatre Parkway, Mountain View, CA, 94043")
+#   # OR search = AddressSearch.new(zip_code: "94043")
 #   lat_long = search.perform
-#   # => ["37.422388", "-122.084188"]
+#   # => ["37.422388", "-122.084188", "94043"]
 #
 class AddressSearch
   # The external URI used for geocoding requests.
@@ -30,10 +31,9 @@ class AddressSearch
     @zip_code = zip_code
   end
 
-  # Fetches cross origin and provides latitude and longitude
+  # Fetches cross origin and provides address information
   # @note the cross-origin provider limits two requests per second
-  # @return [[String, String]] Float-like string representations of
-  # the address' latitude and longitude
+  # @return [[String, String, String]] Representations of the address' latitude, longitude and zip-code
   def perform
     return cached_result if cached_result
 
