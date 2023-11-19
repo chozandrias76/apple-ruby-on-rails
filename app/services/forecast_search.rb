@@ -4,6 +4,22 @@ require 'net/http'
 require 'uri'
 require 'json'
 
+# The ForecastSearch class is responsible for fetching weather forecast data
+# for a given location using the National Weather Service API.
+# It initializes with latitude, longitude, and zip code, and provides
+# methods to perform the forecast search and handle responses.
+#
+# The class handles fetching data from two different endpoints:
+# the initial point data based on latitude and longitude, and
+# the hourly forecast data. It also integrates caching of forecast data
+# using Redis to reduce unnecessary external requests.
+#
+# @example
+#   forecast_search = ForecastSearch.new(latitude: "47.6062", longitude: "-122.3321", zip_code: "98101")
+#   forecast = forecast_search.perform
+#   puts forecast.current_temperature
+#   # 51
+#
 class ForecastSearch
   # The external URI used for finding forecasts.
   INITIAL_EXTERNAL_URI = 'https://api.weather.gov/points/'
@@ -11,6 +27,7 @@ class ForecastSearch
   # @param latitude [String] a float like string representing a location's latitude
   # @param longitude [String] a float like string representing a location's longitude
   # @param zip_code [String] the zip code used to initialize a cache key
+  # @raise [ArgumentError] If any of the arguments are nil.
   def initialize(latitude:, longitude:, zip_code:)
     raise ArgumentError, "#{self.class.name}: Cannot create with nil arguments" unless latitude && longitude && zip_code
 
@@ -21,8 +38,10 @@ class ForecastSearch
     @initial_request_uri = "#{INITIAL_EXTERNAL_URI}#{@latitude},#{@longitude}"
   end
 
-  # Fetches cross origin and provides a Forecast
-  # for a given location at the current time
+  # Performs the operation to fetch and return an up-to-date Forecast object.
+  # This method first checks for a cached forecast before making any external requests.
+  # If the cache is empty or outdated, it fetches new data and updates the cache.
+  #
   # @note the provider gives a forecastHourly link, which is the second request target URI
   # @note the provider yields an array of hourly forecast periods, of which, the first should match the current hour
   # @return [Forecast] A new or cached forecast with up-to-date data
