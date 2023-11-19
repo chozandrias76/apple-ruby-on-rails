@@ -123,7 +123,17 @@
   </div>
 
 
-</div>
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="AddressSearch/ZipMismatchException.html" title="AddressSearch::ZipMismatchException (class)">ZipMismatchException</a></span>
+    
+  
+</p>
+
   
     <h2>
       Constant Summary
@@ -301,13 +311,13 @@
       <pre class="lines">
 
 
-29
-30
-31
-32</pre>
+38
+39
+40
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/address_search.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'app/services/address_search.rb', line 38</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>address:</span><span class='comma'>,</span> <span class='label'>zip_code:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@address</span> <span class='op'>=</span> <span class='id identifier rubyid_address'>address</span>
@@ -377,23 +387,23 @@
       <pre class="lines">
 
 
-37
-38
-39
-40
-41
-42
-43
-44
-45
 46
 47
 48
 49
-50</pre>
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/address_search.rb', line 37</span>
+      <pre class="code"><span class="info file"># File 'app/services/address_search.rb', line 46</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_perform'>perform</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_cached_result'>cached_result</span> <span class='kw'>if</span> <span class='id identifier rubyid_cached_result'>cached_result</span>
@@ -419,7 +429,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Nov 19 01:32:12 2023 by
+  Generated on Sun Nov 19 23:24:40 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
