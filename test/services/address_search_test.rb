@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'test_helper'
 
 describe AddressSearch do # rubocop:disable Metrics/BlockLength

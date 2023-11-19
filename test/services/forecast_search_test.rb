@@ -8,7 +8,7 @@ describe ForecastSearch do # rubocop:disable Metrics/BlockLength
     latitude = '123.45'
     longitude = '-67.89'
     @forecast_search = ForecastSearch.new(latitude:, longitude:, zip_code: @zip_code)
-    @expected_request_url = Regexp.new("#{ForecastSearch::INITIAL_EXTERNAL_URI}.*") #%r{https://api\.weather\.gov/points/.*}
+    @expected_request_url = Regexp.new("#{ForecastSearch::INITIAL_EXTERNAL_URI}.*") # %r{https://api\.weather\.gov/points/.*}
     @mock_forecast_url = 'http://www.fake.com'
 
     @original_logger_level = Rails.logger.level
