@@ -7,6 +7,6 @@ json.data do
     json.current_temperature forecast.current_temperature
   end
   json.links do
-    json.self api_v1_forecasts_search_url(zip_code: forecast.zip_code, format: :json)
+    json.self api_v1_forecasts_search_url(forecast: { zip_code: forecast.zip_code }, format: :json)
   end
 end
