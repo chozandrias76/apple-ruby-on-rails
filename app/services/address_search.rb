@@ -20,7 +20,16 @@ class AddressSearch
   # The external URI used for geocoding requests.
   EXTERNAL_URI = 'https://geocode.maps.co/search'
   # Regular expression to match a ZIP code within an address string.
-  ZIP_MATCH = /(?<!^)\b\d{5}(-\d{4})?\b/
+  ZIP_MATCH = /(?<!^)\b\d{5}(-\d{4})?\b/ # /\\b\d{5}(-\d{4})?\b(?=\s|$)/
+
+  # An extension of StandardError to ensure it can be captured separately and that the message contains the class name
+  # this class is a child to.
+  class ZipMismatchException < StandardError
+    def initialize(message)
+      message = "AddressSearch: #{message}"
+      super
+    end
+  end
 
   # Initializes a new instance of AddressSearch.
   #
@@ -63,7 +72,7 @@ class AddressSearch
   end
 
   def log_unsuccessful_response
-    Rails.logger.debug "#{self.class.name}: Response did not return a successful status code"
+    Rails.logger.error "#{self.class.name}: Response did not return a successful status code"
   end
 
   def cached_result
@@ -75,23 +84,25 @@ class AddressSearch
   def latitude_longitude_and_zip(response)
     processed_response = JSON.parse(response.body)[0]
 
-    unless processed_response
-      Rails.logger.debug "#{self.class.name}: Response contained a falsy body"
+    if !processed_response.present? || processed_response.empty?
+      log_empty_or_falsy_body
       return []
     end
-    if processed_response == []
-      Rails.logger.debug "#{self.class.name}: Response contained an empty body"
-      return []
-    end
-    [processed_response['lat'], processed_response['lon'], @zip_code || matched_zip_code]
+    [processed_response['lat'], processed_response['lon'], @zip_code || matched_zip_code!]
+  end
+
+  def log_empty_or_falsy_body
+    Rails.logger.error "#{self.class.name}: Response contained an empty or falsy body"
   end
 
   def cache_key
-    "#{self.class.name.underscore}:#{@zip_code || matched_zip_code}"
+    "#{self.class.name.underscore}:#{@zip_code || matched_zip_code!}"
   end
 
-  def matched_zip_code
-    match = ZIP_MATCH.match(@address)
+  def matched_zip_code!
+    match = @address.match(ZIP_MATCH)
+    raise ZipMismatchException, 'Cannot process without zip-code within address' unless match
+
     (match || [])[0]
   end
 

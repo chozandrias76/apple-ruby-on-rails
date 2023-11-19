@@ -14,6 +14,7 @@ class ForecastPartialTest < ActionView::TestCase
     # Assert
     assert_equal @forecast.zip_code, json['data']['id']
     assert_equal @forecast.current_temperature, json['data']['attributes']['current_temperature']
-    assert_equal %r{/api/v1/forecasts/search.json?forecast%5Bzip_code%5D=12345/}, json['links']['self']
+    assert_equal 'http://test.host/api/v1/forecasts/search.json?forecast%5Bzip_code%5D=12345',
+                 json['data']['links']['self']
   end
 end
