@@ -37,6 +37,9 @@ curl -X GET -H 'Content-Type: application/json' localhost:3000/forecasts/search?
 ./bin/rails test
 ```
 
+## Documentation
+Generated to the following location for this repository: [Github Page](https://chozandrias76.github.io/apple-ruby-on-rails/)
+
 ## References
 
 * https://geocode.maps.co/
