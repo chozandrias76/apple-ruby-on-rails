@@ -10,10 +10,14 @@ describe ForecastSearch do # rubocop:disable Metrics/BlockLength
     @forecast_search = ForecastSearch.new(latitude:, longitude:, zip_code: @zip_code)
     @expected_request_url = Regexp.new("#{ForecastSearch::INITIAL_EXTERNAL_URI}.*") #%r{https://api\.weather\.gov/points/.*}
     @mock_forecast_url = 'http://www.fake.com'
+
+    @original_logger_level = Rails.logger.level
+    Rails.logger.level = Logger::ERROR
   end
 
   after(:each) do
     Weather.redis.flushdb
+    Rails.logger.level = @original_logger_level
   end
 
   it 'it should be a class with the expected name' do

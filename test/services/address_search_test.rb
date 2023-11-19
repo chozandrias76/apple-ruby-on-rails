@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require 'test_helper'
-require 'minitest/spec'
 
 describe AddressSearch do # rubocop:disable Metrics/BlockLength
   before(:each) do
@@ -8,10 +7,14 @@ describe AddressSearch do # rubocop:disable Metrics/BlockLength
     @address = "123 Fake St. Seattle, WA, #{@zip_code}, US"
     @address_search = AddressSearch.new(@address)
     @expected_request_url = %r{https://geocode.maps.co/search\?q.*}
+
+    @original_logger_level = Rails.logger.level
+    Rails.logger.level = Logger::ERROR
   end
 
   after(:each) do
     Weather.redis.flushdb
+    Rails.logger.level = @original_logger_level
   end
 
   it 'it should be a class with the expected name' do
