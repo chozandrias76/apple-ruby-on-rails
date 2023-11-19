@@ -24,6 +24,22 @@ describe ForecastSearch do # rubocop:disable Metrics/BlockLength
     assert_equal @forecast_search.class.name, 'ForecastSearch'
   end
 
+  it 'it should raise an ArgumentError when any of the keywords are nil' do
+    err1 = assert_raises ArgumentError do
+      ForecastSearch.new(latitude: nil, longitude: nil, zip_code: 1)
+    end
+    err2 = assert_raises ArgumentError do
+      ForecastSearch.new(latitude: 1, longitude: nil, zip_code: nil)
+    end
+    err3 = assert_raises ArgumentError do
+      ForecastSearch.new(latitude: nil, longitude: 1, zip_code: nil)
+    end
+    expected_error_message = 'ForecastSearch: Cannot create with nil arguments'
+    assert_match expected_error_message, err1.message
+    assert_match expected_error_message, err2.message
+    assert_match expected_error_message, err3.message
+  end
+
   it "it should respond to .perform with a Forecast \
       when the external requests returns successful status codes" do
     stub_request(:get, @expected_request_url).to_return(

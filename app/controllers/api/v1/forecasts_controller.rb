@@ -31,9 +31,12 @@ module Api
         }, status: :internal_server_error
       end
 
-      # Use callbacks to share common setup or constraints between actions.
       def search_latitude_longitude
-        @latitude, @longitude, @zip_code = AddressSearch.new(forecast_params[:address]).perform
+        @latitude, @longitude, @zip_code =
+          AddressSearch.new(
+            address: forecast_params[:address],
+            zip_code: forecast_params[:zip_code]
+          ).perform
       end
 
       def update_search_headers(zip_code)
@@ -42,9 +45,8 @@ module Api
         response.headers['Date'] = Time.now.utc.to_formatted_s(:rfc822)
       end
 
-      # Only allow a list of trusted parameters through.
       def forecast_params
-        params.require(:forecast).permit(:address)
+        params.require(:forecast).permit(:address, :zip_code)
       end
     end
   end

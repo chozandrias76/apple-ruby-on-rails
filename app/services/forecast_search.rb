@@ -11,6 +11,8 @@ class ForecastSearch
   # @param longitude [String] a float like string representing a location's longitude
   # @param zip_code [String] the zip code used to initialize a cache key
   def initialize(latitude:, longitude:, zip_code:)
+    raise ArgumentError, "#{self.class.name}: Cannot create with nil arguments" unless latitude && longitude && zip_code
+
     @latitude = format('%<num>0.4f', num: latitude)
     @longitude = format('%<num>0.4f', num: longitude)
     @forecast = Forecast.new(zip_code:)
