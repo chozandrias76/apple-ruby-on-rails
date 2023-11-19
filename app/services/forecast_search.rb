@@ -5,6 +5,7 @@ require 'uri'
 require 'json'
 
 class ForecastSearch
+  # The external URI used for finding forecasts.
   INITIAL_EXTERNAL_URI = 'https://api.weather.gov/points/'
 
   # @param latitude [String] a float like string representing a location's latitude
@@ -22,10 +23,8 @@ class ForecastSearch
 
   # Fetches cross origin and provides a Forecast
   # for a given location at the current time
-  # @note the provider gives a forecastHourly link, which is the second
-  # request target URI
-  # @note the provider yields an array of hourly forecast periods, of which, the first
-  # should match the current hour
+  # @note the provider gives a forecastHourly link, which is the second request target URI
+  # @note the provider yields an array of hourly forecast periods, of which, the first should match the current hour
   # @return [Forecast] A new or cached forecast with up-to-date data
   def perform
     return @forecast if cached_result
