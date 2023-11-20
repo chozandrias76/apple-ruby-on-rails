@@ -123,26 +123,30 @@
 <p>GET /forecasts/search</p>
 </div></p>
       
-      <pre class="example code"><code><span class='comment'># Request format:
-</span><span class='lbrace'>{</span>
-  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>forecast</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>address</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>123 Main St, Anytown, USA 12345</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-  <span class='rbrace'>}</span>
-<span class='rbrace'>}</span>
+      <pre class="example code"><code># Request format:
+{
+  &quot;forecast&quot;: {
+    &quot;address&quot;: &quot;123 Main St, Anytown, USA 12345&quot;,
+  }
+}
 
-<span class='comment'># Response format:
-</span><span class='lbrace'>{</span>
-  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>data</span><span class='label_end'>&quot;:</span>
-    <span class='lbrace'>{</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>type</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>forecast</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>12345</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>attributes</span><span class='label_end'>&quot;:</span><span class='lbrace'>{</span>
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>current_temperature</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>45.0</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>day_ahead_high</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>53.0</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>day_ahead_low</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>29.0</span><span class='tstring_end'>&quot;</span></span>
-      <span class='rbrace'>}</span><span class='comma'>,</span>
-      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>links</span><span class='label_end'>&quot;:</span><span class='lbrace'>{</span>
-        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>self</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>http://localhost:3000/api/v1/forecasts/search.json?forecast%5Bzip_code%5D=12345</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span></code></pre>
+# Response format:
+{
+  &quot;data&quot;:
+    {
+      &quot;type&quot;:&quot;forecast&quot;,
+      &quot;id&quot;:&quot;12345&quot;,
+      &quot;attributes&quot;:{
+        &quot;current_temperature&quot;:&quot;45.0&quot;,
+        &quot;day_ahead_high&quot;:&quot;53.0&quot;,
+        &quot;day_ahead_low&quot;:&quot;29.0&quot;
+      },
+      &quot;links&quot;:{
+        &quot;self&quot;:&quot;http://localhost:3000/api/v1/forecasts/search.json?forecast%5Bzip_code%5D=12345&quot;}}}
+
+# Headers:
+cache-control: max-age=1298, public # time to live in seconds, 1800 indicates a fresh response
+date: Mon, 20 Nov 2023 00:38:15 +0000 # date-time of response</code></pre>
     
   </div>
 
@@ -228,12 +232,12 @@
       <pre class="lines">
 
 
-43
-44
-45</pre>
+47
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/v1/forecasts_controller.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/v1/forecasts_controller.rb', line 47</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_search'>search</span>
   <span class='ivar'>@forecast</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../ForecastSearch.html" title="ForecastSearch (class)">ForecastSearch</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="../../ForecastSearch.html#initialize-instance_method" title="ForecastSearch#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>latitude:</span> <span class='ivar'>@latitude</span><span class='comma'>,</span> <span class='label'>longitude:</span> <span class='ivar'>@longitude</span><span class='comma'>,</span> <span class='label'>zip_code:</span> <span class='ivar'>@zip_code</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_perform'><span class='object_link'><a href="../../ForecastSearch.html#perform-instance_method" title="ForecastSearch#perform (method)">perform</a></span></span>
@@ -248,7 +252,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Nov 20 00:36:31 2023 by
+  Generated on Mon Nov 20 00:41:45 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
