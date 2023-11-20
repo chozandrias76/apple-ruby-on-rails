@@ -103,7 +103,51 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>The ForecastsController is responsible for handling API requests related to weather forecasts. It provides an endpoint to search for weather forecasts based on a given address or ZIP code, returning forecast data such as temperature and weather conditions.</p>
 
+<p>This controller uses AddressSearch to convert an address or ZIP code into latitude and longitude, which are then used by ForecastSearch to fetch the actual forecast data. The controller also manages caching of forecast data and ensures that the response headers are appropriately set for caching.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+        <p class="example_title"><div class='inline'>
+<p>GET /forecasts/search</p>
+</div></p>
+      
+      <pre class="example code"><code><span class='comment'># Request format:
+</span><span class='lbrace'>{</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>forecast</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>address</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>123 Main St, Anytown, USA 12345</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+
+<span class='comment'># Response format:
+</span><span class='lbrace'>{</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>data</span><span class='label_end'>&quot;:</span>
+    <span class='lbrace'>{</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>type</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>forecast</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>12345</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>attributes</span><span class='label_end'>&quot;:</span><span class='lbrace'>{</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>current_temperature</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>45.0</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>day_ahead_high</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>53.0</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>day_ahead_low</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>29.0</span><span class='tstring_end'>&quot;</span></span>
+      <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>links</span><span class='label_end'>&quot;:</span><span class='lbrace'>{</span>
+        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>self</span><span class='label_end'>&quot;:</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>http://localhost:3000/api/v1/forecasts/search.json?forecast%5Bzip_code%5D=12345</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span></code></pre>
+    
+  </div>
+
+
+</div>
 
 
 
@@ -184,21 +228,15 @@
       <pre class="lines">
 
 
-11
-12
-13
-14
-15
-16</pre>
+43
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/api/v1/forecasts_controller.rb', line 11</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/api/v1/forecasts_controller.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_search'>search</span>
   <span class='ivar'>@forecast</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../ForecastSearch.html" title="ForecastSearch (class)">ForecastSearch</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="../../ForecastSearch.html#initialize-instance_method" title="ForecastSearch#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>latitude:</span> <span class='ivar'>@latitude</span><span class='comma'>,</span> <span class='label'>longitude:</span> <span class='ivar'>@longitude</span><span class='comma'>,</span> <span class='label'>zip_code:</span> <span class='ivar'>@zip_code</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_perform'><span class='object_link'><a href="../../ForecastSearch.html#perform-instance_method" title="ForecastSearch#perform (method)">perform</a></span></span>
-  <span class='comment'># update_search_headers must be called after ForecastSearch for this @zip_code
-</span>  <span class='comment'># otherwise the TTL will be -2
-</span>  <span class='id identifier rubyid_update_search_headers'>update_search_headers</span><span class='lparen'>(</span><span class='ivar'>@zip_code</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -210,7 +248,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Nov 19 23:24:40 2023 by
+  Generated on Mon Nov 20 00:34:33 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

@@ -325,13 +325,21 @@
 36
 37
 38
-39</pre>
+39
+40
+41
+42
+43</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/services/forecast_search.rb', line 31</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>latitude:</span><span class='comma'>,</span> <span class='label'>longitude:</span><span class='comma'>,</span> <span class='label'>zip_code:</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: Cannot create with nil arguments</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_latitude'>latitude</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_longitude'>longitude</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_zip_code'>zip_code</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_latitude'>latitude</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_longitude'>longitude</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_zip_code'>zip_code</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span>
+          <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>: Cannot create with nil arguments \
+          \n lat: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_latitude'>latitude</span><span class='embexpr_end'>}</span><span class='tstring_content'>, lon: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_longitude'>longitude</span><span class='embexpr_end'>}</span><span class='tstring_content'>, zip: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_zip_code'>zip_code</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
 
   <span class='ivar'>@latitude</span> <span class='op'>=</span> <span class='id identifier rubyid_format'>format</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%&lt;num&gt;0.4f</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>num:</span> <span class='id identifier rubyid_latitude'>latitude</span><span class='rparen'>)</span>
   <span class='ivar'>@longitude</span> <span class='op'>=</span> <span class='id identifier rubyid_format'>format</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%&lt;num&gt;0.4f</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>num:</span> <span class='id identifier rubyid_longitude'>longitude</span><span class='rparen'>)</span>
@@ -410,10 +418,6 @@
       <pre class="lines">
 
 
-48
-49
-50
-51
 52
 53
 54
@@ -424,22 +428,26 @@
 59
 60
 61
-62</pre>
+62
+63
+64
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/forecast_search.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'app/services/forecast_search.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_perform'>perform</span>
   <span class='kw'>return</span> <span class='ivar'>@forecast</span> <span class='kw'>if</span> <span class='id identifier rubyid_cached_result'>cached_result</span>
 
-  <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='id identifier rubyid_point_weather'>point_weather</span>
-  <span class='kw'>unless</span> <span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Net</span><span class='op'>::</span><span class='const'>HTTPSuccess</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_metadata_response'>metadata_response</span> <span class='op'>=</span> <span class='id identifier rubyid_fetch_point_metadata'>fetch_point_metadata</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_metadata_response'>metadata_response</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Net</span><span class='op'>::</span><span class='const'>HTTPSuccess</span><span class='rparen'>)</span>
 
     <span class='id identifier rubyid_log_unsuccessful_response'>log_unsuccessful_response</span>
     <span class='kw'>return</span> <span class='ivar'>@forecast</span>
   <span class='kw'>end</span>
 
-  <span class='id identifier rubyid_update_forecast_and_cache'>update_forecast_and_cache</span><span class='lparen'>(</span><span class='id identifier rubyid_response'>response</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_update_forecast_and_cache'>update_forecast_and_cache</span><span class='lparen'>(</span><span class='id identifier rubyid_metadata_response'>metadata_response</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_log_successful_response'>log_successful_response</span>
   <span class='ivar'>@forecast</span>
@@ -454,7 +462,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Nov 19 23:24:40 2023 by
+  Generated on Mon Nov 20 00:34:33 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
