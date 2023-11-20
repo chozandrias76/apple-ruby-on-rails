@@ -9,7 +9,7 @@ class ForecastsControllerTest < ActionDispatch::IntegrationTest
 
     # Define what the mock's perform method should return
     @address_search_mock.expect :perform, ['123.45', '-678.91', '98115']
-    @forecast_search_mock.expect :perform, Forecast.new
+    @forecast_search_mock.expect :perform, Forecast.new(zip_code: '12345')
 
     @original_logger_level = Rails.logger.level
     Rails.logger.level = Logger::ERROR

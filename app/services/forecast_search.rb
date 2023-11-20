@@ -48,14 +48,14 @@ class ForecastSearch
   def perform
     return @forecast if cached_result
 
-    response = point_weather
-    unless response.is_a?(Net::HTTPSuccess)
+    metadata_response = fetch_point_metadata
+    unless metadata_response.is_a?(Net::HTTPSuccess)
 
       log_unsuccessful_response
       return @forecast
     end
 
-    update_forecast_and_cache(response)
+    update_forecast_and_cache(metadata_response)
 
     log_successful_response
     @forecast
@@ -66,10 +66,31 @@ class ForecastSearch
   def update_forecast_and_cache(response)
     forecast_hourly_request = forecast_hourly_request(response.body)
     complete_response = fetch_hourly_forecast(forecast_hourly_request)
-    @forecast.current_temperature =
-      JSON.parse(complete_response.body)['properties']['periods'].first['temperature']
+    parsed_periods = JSON.parse(complete_response.body)['properties']['periods']
+    apply_parsed_periods_data(parsed_periods)
 
     Weather.redis.set(@cache_key, @forecast.to_json, ex: Constants::DEFAULT_CACHE_DURATION_SECONDS)
+  end
+
+  def apply_parsed_periods_data(parsed_periods)
+    @forecast.current_temperature =
+      BigDecimal(parsed_periods.first['temperature'])
+    day_ahead_high, day_ahead_low = day_ahead_high_and_low(parsed_periods)
+
+    @forecast.day_ahead_high = day_ahead_high
+    @forecast.day_ahead_low = day_ahead_low
+  end
+
+  def day_ahead_high_and_low(parsed_periods)
+    day_ahead_high = nil
+    day_ahead_low = nil
+
+    parsed_periods.each do |period|
+      current_temperature = BigDecimal(period['temperature'])
+      day_ahead_high = current_temperature if day_ahead_high.nil? || day_ahead_high < current_temperature
+      day_ahead_low = current_temperature if day_ahead_low.nil? || day_ahead_low > current_temperature
+    end
+    [day_ahead_high, day_ahead_low]
   end
 
   def log_successful_response
@@ -90,14 +111,15 @@ class ForecastSearch
     JSON.parse(response_body)['properties']['forecastHourly']
   end
 
-  def point_weather
+  # "https://api.weather.gov/points/12.3,-4.56"
+  def fetch_point_metadata
     Net::HTTP.get_response(
       URI.parse(@initial_request_uri)
     )
   end
 
-  # @param forecast_hourly_request [String] example:
-  # "https://api.weather.gov/gridpoints/SEW/125,71/forecast/hourly"
+  # @param forecast_hourly_request [String] Usually provided by the initial request's response
+  # @example fetch_hourly_forecast("https://api.weather.gov/gridpoints/SEW/125,71/forecast/hourly")
   def fetch_hourly_forecast(forecast_hourly_request)
     Net::HTTP.get_response(
       URI.parse(forecast_hourly_request)

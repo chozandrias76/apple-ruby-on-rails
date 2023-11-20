@@ -48,10 +48,16 @@ describe ForecastSearch do # rubocop:disable Metrics/BlockLength
     )
     stub_request(:get, Regexp.new("#{@mock_forecast_url}.*")).to_return(
       status: 200,
-      body: '{"properties": { "periods": [{"temperature": "123"}]}}', headers: {}
+      body: '{"properties": { "periods": [{"temperature": "123"}, {"temperature": "234"}, {"temperature": "12.3"}]}}', headers: {}
     )
 
-    assert_equal Forecast.new(current_temperature: '123', zip_code: @zip_code).to_h, @forecast_search.perform.to_h
+    assert_equal Forecast.new(
+      current_temperature: BigDecimal('123'),
+      zip_code: @zip_code,
+      day_ahead_high: BigDecimal('234'),
+      day_ahead_low: BigDecimal('12.3')
+    ).to_h,
+                 @forecast_search.perform.to_h
   end
 
   it "it should respond to .perform with a default Forecast \
@@ -73,7 +79,11 @@ describe ForecastSearch do # rubocop:disable Metrics/BlockLength
     JSON
     Weather.redis.set("forecast_search:#{@zip_code}", cached_data)
 
-    assert_equal JSON.parse(cached_data).merge(current_temperature: BigDecimal::NAN).symbolize_keys,
+    assert_equal JSON.parse(cached_data).merge(
+      current_temperature: BigDecimal::NAN,
+      day_ahead_high: BigDecimal::NAN,
+      day_ahead_low: BigDecimal::NAN
+    ).symbolize_keys,
                  @forecast_search.perform.to_h
   end
 end
