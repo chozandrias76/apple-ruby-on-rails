@@ -6,7 +6,7 @@ It focuses on backend functionality, prioritizing the retrieval and caching of w
 ## Features
 * Address Input: Accepts user input for addresses.
 * Forecast Retrieval: Fetches forecast data for the input address, including current temperature.
-* Extended Forecast: (Optional) Retrieves high/low temperatures and extended forecast details.
+* Extended Forecast: Retrieves day ahead high/low temperatures.
 * Data Display: Showcases the requested forecast details to the user.
 * Caching: Implements a 30-minute caching mechanism for forecast details by zip codes, displaying an indicator if the result is from the cache.
 ## Installation
