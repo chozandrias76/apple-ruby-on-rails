@@ -33,6 +33,10 @@ module Api
     #         },
     #         "links":{
     #           "self":"http://localhost:3000/api/v1/forecasts/search.json?forecast%5Bzip_code%5D=12345"}}}
+    #
+    #   # Headers:
+    #   cache-control: max-age=1298, public # time to live in seconds, 1800 indicates a fresh response
+    #   date: Mon, 20 Nov 2023 00:38:15 +0000 # date-time of response
     class ForecastsController < ApplicationController
       before_action :search_latitude_longitude, only: %i[search]
       after_action :update_search_headers, only: %i[search]
