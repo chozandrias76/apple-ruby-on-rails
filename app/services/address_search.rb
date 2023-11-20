@@ -20,7 +20,9 @@ class AddressSearch
   # The external URI used for geocoding requests.
   EXTERNAL_URI = 'https://geocode.maps.co/search'
   # Regular expression to match a ZIP code within an address string.
-  ZIP_MATCH = /(?<!^)\b\d{5}(-\d{4})?\b/ # /\\b\d{5}(-\d{4})?\b(?=\s|$)/
+  # There is no perfect expression for matching generic strings,
+  # but this variant matches with the least valid exceptions.
+  ZIP_MATCH = /\d{5}(-\d{4})?\b/
 
   # An extension of StandardError to ensure it can be captured separately and that the message contains the class name
   # this class is a child to.
@@ -76,9 +78,12 @@ class AddressSearch
   end
 
   def cached_result
-    return unless Weather.redis.get(cache_key)
+    return unless Weather.redis.get(cache_key).present? # Allows for re-fetching
 
-    JSON.parse(Weather.redis.get(cache_key))
+    parsed_response = JSON.parse(Weather.redis.get(cache_key))
+    return if parsed_response.empty? # Allows for re-fetching
+
+    parsed_response
   end
 
   def latitude_longitude_and_zip(response)

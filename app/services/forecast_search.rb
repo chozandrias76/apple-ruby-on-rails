@@ -29,7 +29,11 @@ class ForecastSearch
   # @param zip_code [String] the zip code used to initialize a cache key
   # @raise [ArgumentError] If any of the arguments are nil.
   def initialize(latitude:, longitude:, zip_code:)
-    raise ArgumentError, "#{self.class.name}: Cannot create with nil arguments" unless latitude && longitude && zip_code
+    unless latitude && longitude && zip_code
+      raise ArgumentError,
+            "#{self.class.name}: Cannot create with nil arguments \
+            \n lat: #{latitude}, lon: #{longitude}, zip: #{zip_code}"
+    end
 
     @latitude = format('%<num>0.4f', num: latitude)
     @longitude = format('%<num>0.4f', num: longitude)
